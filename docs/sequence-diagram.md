@@ -1,88 +1,65 @@
 # Sequence Diagram
 
+## Authentication & JWT Flow
+
 ```mermaid
 sequenceDiagram
     actor Client
 
-    participant Security as Spring Security
-    participant Controller as SaleController
-    participant Service as SaleServiceImpl
-    participant ProductRepo as ProductsRepository
-    participant StockRepo as StocksRepository
-    participant SalesRepo as SalesRepository
-    participant DetailRepo as SaleDetailsRepository
+    participant AuthController as AuthController
+    participant AuthService as AuthServiceImpl
+    participant UserRepo as UsersRepository
+    participant PasswordEncoder as PasswordEncoder
+    participant JwtUtil as JwtUtil
     participant DB as PostgreSQL
 
-    Client->>Security: POST /api/sales<br/>Bearer JWT
+    Client->>AuthController: POST /api/auth/login
+    AuthController->>AuthService: login(LoginRequest)
 
-    Security->>Controller: Authorized Request
-    Controller->>Service: createSale(request)
+    AuthService->>AuthService: Log attempt login
+    AuthService->>UserRepo: findByUsername(username)
+    UserRepo->>DB: SELECT users WHERE username = ?
+    DB-->>UserRepo: user data
+    UserRepo-->>AuthService: Users
 
-    loop For Each Item
-        Service->>ProductRepo: findById(productId)
-        ProductRepo->>DB: SELECT product
-        DB-->>ProductRepo: product data
-        ProductRepo-->>Service: product
+    AuthService->>PasswordEncoder: matches(rawPassword, hashedPassword)
 
-        Service->>StockRepo: findByProductId(productId)
-        StockRepo->>DB: SELECT stock
-        DB-->>StockRepo: stock data
-        StockRepo-->>Service: stock
-
-        alt Stock Not Enough
-            Service-->>Controller: RuntimeException
-            Controller-->>Client: 400 Bad Request
-        else Stock Available
-            Service->>StockRepo: update stock quantity
-            StockRepo->>DB: UPDATE stocks
-            DB-->>StockRepo: success
-
-            Service->>DetailRepo: save sale detail
-            DetailRepo->>DB: INSERT sale_details
-            DB-->>DetailRepo: success
-        end
+    alt Invalid username or password
+        AuthService-->>AuthController: BadCredentialsException
+        AuthController-->>Client: 401 Unauthorized / 403 Forbidden
+    else Login success
+        AuthService->>JwtUtil: generateToken(username, role)
+        JwtUtil-->>AuthService: JWT Token
+        AuthService-->>AuthController: LoginResponse
+        AuthController-->>Client: 200 OK + JWT Token
     end
-
-    Service->>SalesRepo: save sales transaction
-    SalesRepo->>DB: INSERT sales
-    DB-->>SalesRepo: success
-
-    Service-->>Controller: SaleResponse
-    Controller-->>Client: 200 OK
 ```
 
 ---
 
-## Login Flow
+## Protected Endpoint Flow
 
 ```mermaid
 sequenceDiagram
     actor Client
 
-    participant Controller as AuthController
-    participant Service as AuthServiceImpl
-    participant UserRepo as UsersRepository
-    participant JWT as JwtUtil
-    participant DB as PostgreSQL
+    participant JwtFilter as JwtAuthenticationFilter
+    participant JwtUtil as JwtUtil
+    participant SecurityContext as SecurityContextHolder
+    participant Controller as Protected Controller
 
-    Client->>Controller: POST /api/auth/login
+    Client->>JwtFilter: Request Protected Endpoint<br/>Authorization: Bearer Token
 
-    Controller->>Service: login(request)
+    JwtFilter->>JwtFilter: Read Authorization Header
+    JwtFilter->>JwtUtil: validateToken(token)
 
-    Service->>UserRepo: findByUsername(username)
-    UserRepo->>DB: SELECT user
-    DB-->>UserRepo: user data
-    UserRepo-->>Service: user
-
-    alt Invalid Username / Password
-        Service-->>Controller: Authentication Failed
-        Controller-->>Client: 401 Unauthorized
-    else Login Success
-        Service->>JWT: generateToken(username)
-        JWT-->>Service: JWT Token
-
-        Service-->>Controller: LoginResponse
-        Controller-->>Client: 200 OK + Token
+    alt Token invalid or missing
+        JwtFilter-->>Client: 403 Forbidden
+    else Token valid
+        JwtFilter->>JwtUtil: extractUsername(token)
+        JwtFilter->>JwtUtil: extractRole(token)
+        JwtFilter->>SecurityContext: setAuthentication(username, role)
+        JwtFilter->>Controller: Continue request
     end
 ```
 
@@ -94,25 +71,232 @@ sequenceDiagram
 sequenceDiagram
     actor Client
 
+    participant JwtFilter as JwtAuthenticationFilter
     participant Controller as ProductController
     participant Service as ProductServiceImpl
-    participant Repository as ProductsRepository
+    participant ProductRepo as ProductsRepository
+    participant StockRepo as StocksRepository
+    participant ExceptionHandler as GlobalExceptionHandler
     participant DB as PostgreSQL
 
-    Client->>Controller: POST /api/products
+    Client->>JwtFilter: Request /api/products<br/>Bearer JWT
+    JwtFilter->>Controller: Authorized request
 
-    Controller->>Service: create(request)
+    alt GET /api/products
+        Controller->>Service: findAll()
+        Service->>ProductRepo: findAll()
+        ProductRepo->>DB: SELECT products
+        DB-->>ProductRepo: product list
+        ProductRepo-->>Service: List Products
+        Service-->>Controller: List ProductResponse
+        Controller-->>Client: 200 OK
 
-    Service->>Repository: save(product)
+    else GET /api/products/{id}
+        Controller->>Service: findById(id)
+        Service->>ProductRepo: findById(id)
+        ProductRepo->>DB: SELECT product WHERE id = ?
+        DB-->>ProductRepo: product / empty
 
-    Repository->>DB: INSERT products
-    DB-->>Repository: success
+        alt Product not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Product found
+            ProductRepo-->>Service: Product
+            Service-->>Controller: ProductResponse
+            Controller-->>Client: 200 OK
+        end
 
-    Repository-->>Service: saved product
+    else POST /api/products
+        Controller->>Service: create(ProductRequest)
+        Service->>ProductRepo: existsBySku(sku)
+        ProductRepo->>DB: SELECT product WHERE sku = ?
+        DB-->>ProductRepo: true / false
 
-    Service-->>Controller: ProductResponse
+        alt SKU already exists
+            Service-->>ExceptionHandler: RuntimeException
+            ExceptionHandler-->>Client: 400 Bad Request
+        else New product
+            Service->>ProductRepo: save(product)
+            ProductRepo->>DB: INSERT products
+            DB-->>ProductRepo: saved product
 
-    Controller-->>Client: 201 Created
+            Service->>StockRepo: save(initial stock)
+            StockRepo->>DB: INSERT stocks quantity = 0
+            DB-->>StockRepo: saved stock
+
+            Service-->>Controller: ProductResponse
+            Controller-->>Client: 200 OK
+        end
+
+    else PUT /api/products/{id}
+        Controller->>Service: update(id, ProductRequest)
+        Service->>ProductRepo: findById(id)
+        ProductRepo->>DB: SELECT product WHERE id = ?
+        DB-->>ProductRepo: product / empty
+
+        alt Product not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Product found
+            Service->>ProductRepo: findBySku(sku)
+            ProductRepo->>DB: SELECT product WHERE sku = ?
+            DB-->>ProductRepo: product / empty
+
+            alt Duplicate SKU from another product
+                Service-->>ExceptionHandler: RuntimeException
+                ExceptionHandler-->>Client: 400 Bad Request
+            else Valid update
+                Service->>ProductRepo: save(updated product)
+                ProductRepo->>DB: UPDATE products
+                DB-->>ProductRepo: updated product
+                Service-->>Controller: ProductResponse
+                Controller-->>Client: 200 OK
+            end
+        end
+
+    else DELETE /api/products/{id}
+        Controller->>Service: delete(id)
+        Service->>ProductRepo: findById(id)
+        ProductRepo->>DB: SELECT product WHERE id = ?
+        DB-->>ProductRepo: product / empty
+
+        alt Product not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Product found
+            Service->>ProductRepo: delete(product)
+            ProductRepo->>DB: DELETE products
+            DB-->>ProductRepo: success
+            Controller-->>Client: 200 OK<br/>Product deleted successfully
+        end
+    end
+```
+
+---
+
+## Stock Flow
+
+```mermaid
+sequenceDiagram
+    actor Client
+
+    participant JwtFilter as JwtAuthenticationFilter
+    participant Controller as StockController
+    participant Service as StockServiceImpl
+    participant StockRepo as StocksRepository
+    participant ExceptionHandler as GlobalExceptionHandler
+    participant DB as PostgreSQL
+
+    Client->>JwtFilter: Request /api/stocks<br/>Bearer JWT
+    JwtFilter->>Controller: Authorized request
+
+    alt GET /api/stocks
+        Controller->>Service: getAllStocks()
+        Service->>StockRepo: findAll()
+        StockRepo->>DB: SELECT stocks JOIN products
+        DB-->>StockRepo: stock list
+        StockRepo-->>Service: List Stocks
+        Service-->>Controller: List StockResponse
+        Controller-->>Client: 200 OK
+
+    else GET /api/stocks/{productId}
+        Controller->>Service: getStock(productId)
+        Service->>StockRepo: findByProduct_Id(productId)
+        StockRepo->>DB: SELECT stock WHERE product_id = ?
+        DB-->>StockRepo: stock / empty
+
+        alt Stock not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Stock found
+            StockRepo-->>Service: Stocks
+            Service-->>Controller: StockResponse
+            Controller-->>Client: 200 OK
+        end
+    end
+```
+
+---
+
+## Sales Transaction Flow
+
+```mermaid
+sequenceDiagram
+    actor Client
+
+    participant JwtFilter as JwtAuthenticationFilter
+    participant Controller as SaleController
+    participant Service as SaleServiceImpl
+    participant ProductRepo as ProductsRepository
+    participant StockRepo as StocksRepository
+    participant SalesRepo as SalesRepository
+    participant DetailRepo as SaleDetailsRepository
+    participant ExceptionHandler as GlobalExceptionHandler
+    participant DB as PostgreSQL
+
+    Client->>JwtFilter: POST /api/sales<br/>Bearer JWT
+    JwtFilter->>Controller: Authorized Request
+    Controller->>Service: createSale(SaleRequest)
+
+    Service->>SalesRepo: countBySaleDateToday(today)
+    SalesRepo->>DB: COUNT sales by sale_date
+    DB-->>SalesRepo: countToday
+    SalesRepo-->>Service: countToday
+
+    Service->>Service: generateTransactionNo()
+    Service->>SalesRepo: save(sale header)
+    SalesRepo->>DB: INSERT sales
+    DB-->>SalesRepo: saved sales
+    SalesRepo-->>Service: Sales
+
+    loop For Each Item
+        Service->>ProductRepo: findById(productId)
+        ProductRepo->>DB: SELECT product WHERE id = ?
+        DB-->>ProductRepo: product / empty
+
+        alt Product not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Product found
+            ProductRepo-->>Service: Product
+        end
+
+        Service->>StockRepo: findByProduct_Id(productId)
+        StockRepo->>DB: SELECT stock WHERE product_id = ?
+        DB-->>StockRepo: stock / empty
+
+        alt Stock not found
+            Service-->>ExceptionHandler: ResourceNotFoundException
+            ExceptionHandler-->>Client: 404 Not Found
+        else Stock found
+            StockRepo-->>Service: Stock
+        end
+
+        alt Stock not enough
+            Service-->>ExceptionHandler: RuntimeException
+            ExceptionHandler-->>Client: 400 Bad Request
+        else Stock available
+            Service->>StockRepo: save(updated stock)
+            StockRepo->>DB: UPDATE stocks quantity
+            DB-->>StockRepo: success
+
+            Service->>Service: calculate subtotal, modal, profit
+            Service->>DetailRepo: save(sale detail)
+            DetailRepo->>DB: INSERT sale_details
+            DB-->>DetailRepo: success
+        end
+    end
+
+    Service->>SalesRepo: save(totalAmount)
+    SalesRepo->>DB: UPDATE sales total_amount
+    DB-->>SalesRepo: success
+
+    Service->>DetailRepo: findBySaleId(saleId)
+    DetailRepo->>DB: SELECT sale_details WHERE sale_id = ?
+    DB-->>DetailRepo: detail list
+
+    Service-->>Controller: SaleResponse
+    Controller-->>Client: 200 OK
 ```
 
 ---
@@ -123,24 +307,49 @@ sequenceDiagram
 sequenceDiagram
     actor Client
 
+    participant JwtFilter as JwtAuthenticationFilter
     participant Controller as ReportController
     participant Service as ReportServiceImpl
     participant SalesRepo as SalesRepository
     participant DetailRepo as SaleDetailsRepository
     participant DB as PostgreSQL
 
-    Client->>Controller: GET /api/reports/top-selling-products
+    Client->>JwtFilter: GET /api/reports/*<br/>Bearer JWT
+    JwtFilter->>Controller: Authorized Request
 
-    Controller->>Service: getTop5SellingProducts()
+    alt GET /api/reports/top-selling-products
+        Controller->>Service: getTop5SellingProducts()
+        Service->>DetailRepo: findTopSellingProducts()
+        DetailRepo->>DB: SUM(quantity) GROUP BY product
+        DB-->>DetailRepo: top 5 result
+        DetailRepo-->>Service: List Object[]
+        Service-->>Controller: List TopSellingProductResponse
+        Controller-->>Client: 200 OK
 
-    Service->>DetailRepo: aggregate quantity sold
+    else GET /api/reports/top-profitable-products
+        Controller->>Service: getTop5ProfitableProducts()
+        Service->>DetailRepo: findTopProfitableProducts()
+        DetailRepo->>DB: SUM(profit) GROUP BY product
+        DB-->>DetailRepo: top 5 result
+        DetailRepo-->>Service: List Object[]
+        Service-->>Controller: List TopProfitProductResponse
+        Controller-->>Client: 200 OK
 
-    DetailRepo->>DB: SUM(quantity) GROUP BY product
-    DB-->>DetailRepo: aggregated result
+    else GET /api/reports/sales-containing-top-profitable-products
+        Controller->>Service: getSalesContainingTop5ProfitableProducts()
+        Service->>DetailRepo: findTopProfitableProductIds()
+        DetailRepo->>DB: SELECT top 5 product ids by profit
+        DB-->>DetailRepo: product ids
 
-    DetailRepo-->>Service: top selling products
+        Service->>SalesRepo: findSalesContainingProducts(productIds)
+        SalesRepo->>DB: SELECT DISTINCT sales containing product ids
+        DB-->>SalesRepo: sales list
 
-    Service-->>Controller: TopSellingProductResponse
+        Service->>DetailRepo: findBySaleId(saleId)
+        DetailRepo->>DB: SELECT sale details
+        DB-->>DetailRepo: detail list
 
-    Controller-->>Client: 200 OK
+        Service-->>Controller: List ProfitSaleResponse
+        Controller-->>Client: 200 OK
+    end
 ```
