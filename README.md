@@ -49,263 +49,13 @@ Contoh:
 AA202606230001
 ```
 
-## Architecture
+## Visuals ERD
 
-```text
-     ┌────────────────────┐
-     │  Client Layer      │
-     │                    │
-     │ - Swagger UI       │
-     │ - Postman          │
-     │ - REST Client      │
-     └─────────┬──────────┘
-               │ HTTP Request
-               ▼
-   ┌─────────────────────────┐
-   │    Controller Layer     │
-   │                         │
-   │ - AuthController        │
-   │ - ProductController     │
-   │ - StockController       │
-   │ - SaleController        │
-   │ - ReportController      │
-   └───────────┬─────────────┘
-               │
-               ▼
-   ┌─────────────────────────┐
-   │    Security Layer       │
-   │                         │
-   │ - Spring Security       │
-   │ - JWT Authentication    │
-   │ - Authorization Filter  │
-   └───────────┬─────────────┘
-               │
-               ▼
-     ┌────────────────────┐
-     │   Service Layer    │
-     │                    │
-     │ - AuthService      │
-     │ - ProductService   │
-     │ - StockService     │
-     │ - SaleService      │
-     │ - ReportService    │
-     └─────────┬──────────┘
-               │
-               ▼
-   ┌──────────────────────────┐
-   │   Repository Layer       │
-   │                          │
-   │ - UsersRepository        │
-   │ - ProductsRepository     │
-   │ - StocksRepository       │
-   │ - SalesRepository        │
-   │ - SaleDetailsRepository  │
-   └───────────┬──────────────┘
-               │
-               ▼
-      ┌──────────────────┐
-      │  Database Layer  │
-      │                  │
-      │ - users          │
-      │ - products       │
-      │ - stocks         │
-      │ - sales          │
-      │ - sale_details   │
-      └──────────────────┘
-```
+Berikut adalah ERD (Entity Relationship Diagram) untuk sistem **3pm-api-toko**:
 
-### Architecture Summary
-
-| Step | Component        | Description                                                      |
-| ---- | ---------------- | ---------------------------------------------------------------- |
-| 1    | Client Layer     | User mengakses API melalui Swagger UI, Postman, atau REST Client |
-| 2    | Controller Layer | Menerima HTTP Request dan melakukan validasi request             |
-| 3    | Security Layer   | Memverifikasi JWT Token dan melakukan authorization              |
-| 4    | Service Layer    | Menjalankan business logic aplikasi                              |
-| 5    | Repository Layer | Mengakses database menggunakan Spring Data JPA                   |
-| 6    | Database Layer   | Menyimpan data master barang, stok, penjualan, dan laporan       |
+![ERD Event Booking](docs/ERD_Toko.png)
 
 
-## Architecture Diagram
-
-See:
-
-- [docs/sequence-diagram.md](docs/sequence-diagram.md)
-
-
-
-## Folder Structure
-
-```text
-threepm-api-toko
-├── docs
-│   └── sequence-diagram.md
-├── logs
-│   ├── error.log
-│   └── trail.log
-├── src
-│   ├── main
-│   │   ├── java/com/threepm/api/toko
-│   │   │     ├── Config
-│   │   │     │   ├── OpenApiConfig.java
-│   │   │     │   └── SecurityConfig.java
-│   │   │     │
-│   │   │     ├── Controller
-│   │   │     │   ├── AuthController.java
-│   │   │     │   ├── ProductController.java
-│   │   │     │   ├── ReportController.java
-│   │   │     │   ├── SaleController.java
-│   │   │     │   └── StockController.java
-│   │   │     │
-│   │   │     ├── Model
-│   │   │     │   ├── Entity
-│   │   │     │   │   ├── Users.java
-│   │   │     │   │   ├── Products.java
-│   │   │     │   │   ├── Stocks.java
-│   │   │     │   │   ├── Sales.java
-│   │   │     │   │   └── SaleDetails.java
-│   │   │     │   │
-│   │   │     │   ├── Request
-│   │   │     │   │   ├── LoginRequest.java
-│   │   │     │   │   ├── ProductRequest.java
-│   │   │     │   │   ├── SaleRequest.java
-│   │   │     │   │   └── SaleDetailRequest.java
-│   │   │     │   │
-│   │   │     │   └── Response
-│   │   │     │       ├── BaseResponse.java
-│   │   │     │       ├── LoginResponse.java
-│   │   │     │       ├── ProductResponse.java
-│   │   │     │       ├── StockResponse.java
-│   │   │     │       ├── SaleResponse.java
-│   │   │     │       ├── SaleDetailResponse.java
-│   │   │     │       ├── TopSellingProductResponse.java
-│   │   │     │       ├── TopProfitProductResponse.java
-│   │   │     │       └── ProfitSaleResponse.java
-│   │   │     │
-│   │   │     ├── Repository
-│   │   │     │   ├── UsersRepository.java
-│   │   │     │   ├── ProductsRepository.java
-│   │   │     │   ├── StocksRepository.java
-│   │   │     │   ├── SalesRepository.java
-│   │   │     │   └── SaleDetailsRepository.java
-│   │   │     │
-│   │   │     ├── Service
-│   │   │     │   ├── AuthService.java
-│   │   │     │   ├── ProductService.java
-│   │   │     │   ├── StockService.java
-│   │   │     │   ├── SaleService.java
-│   │   │     │   ├── ReportService.java
-│   │   │     │   │
-│   │   │     │   └── impl
-│   │   │     │       ├── AuthServiceImpl.java
-│   │   │     │       ├── ProductServiceImpl.java
-│   │   │     │       ├── StockServiceImpl.java
-│   │   │     │       ├── SaleServiceImpl.java
-│   │   │     │       └── ReportServiceImpl.java
-│   │   │     │
-│   │   │     ├── Util
-│   │   │     │   └── JwtUtil.java
-│   │   │     │
-│   │   │     └── ApiTokoApplication.java
-│   │   │
-│   │   └── resources
-│   │       ├── application.yml
-│   │       ├── banner.txt
-│   │       └── db
-│   │           └── migration
-│   │               ├── V1__create_initial_schema.sql
-│   │               └── V2__insert_initial_data.sql
-│   │
-│   └── test/java/com/threepm/api/toko 
-│       └── ApiTokoApplicationTests.java
-│
-├── pom.xml
-├── run.sh
-├── README.md
-├── HELP.md
-├── Test for Backend.pdf
-├── mvnw
-├── mvnw.cmd
-└── .gitignore
-```
-
-## Architecture Diagram
-
-See:
-
-- [docs/sequence-diagram.md](docs/sequence-diagram.md)
-
-
-
-## Configuration
-
-Bagian ini menjelaskan konfigurasi utama yang digunakan oleh aplikasi **3pm-api-toko**.
-
-### Main Configuration (`application.yml`)
-
-File ini merupakan konfigurasi utama aplikasi yang digunakan saat menjalankan project secara lokal.
-
-```yaml
-spring:
-  application:
-    name: api-toko
-
-  banner:
-    location: classpath:banner.txt
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/db_toko
-    username: toko_user
-    password: toko_password
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-
-server:
-  port: 8080
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-
-  api-docs:
-    path: /v3/api-docs
-
-logging:
-  level:
-    com.threepm.api.toko: DEBUG
-    org.springframework.security: INFO
-
-app:
-  name: 3PM Backend Test API Toko
-  version: 1.0.0
-
-  security:
-    jwt-secret: ${JWT_SECRET:3pm-backend-test-secret-key-minimum-32-characters}
-    jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-    permit-all: ${APP_SECURITY_PERMIT_ALL:false}
-```
-
-### Environment Variables
-
-Berikut adalah environment variable yang dapat digunakan untuk melakukan override konfigurasi aplikasi.
-
-| Variable                | Default Value                                     | Description                                                    |
-| ----------------------- | ------------------------------------------------- | -------------------------------------------------------------- |
-| JWT_SECRET              | 3pm-backend-test-secret-key-minimum-32-characters | Secret key yang digunakan untuk signing JWT token              |
-| JWT_EXPIRATION_MS       | 86400000                                          | Masa berlaku JWT token dalam millisecond (24 jam)              |
-| APP_SECURITY_PERMIT_ALL | false                                             | Mengaktifkan atau menonaktifkan security pada seluruh endpoint |
 
 ## Database Setup
 
@@ -513,6 +263,264 @@ Format tersebut terdiri dari:
 | 0001     | Running Number Harian |
 |          |                       |
 
+
+
+## Architecture
+
+```text
+     ┌────────────────────┐
+     │  Client Layer      │
+     │                    │
+     │ - Swagger UI       │
+     │ - Postman          │
+     │ - REST Client      │
+     └─────────┬──────────┘
+               │ HTTP Request
+               ▼
+   ┌─────────────────────────┐
+   │    Controller Layer     │
+   │                         │
+   │ - AuthController        │
+   │ - ProductController     │
+   │ - StockController       │
+   │ - SaleController        │
+   │ - ReportController      │
+   └───────────┬─────────────┘
+               │
+               ▼
+   ┌─────────────────────────┐
+   │    Security Layer       │
+   │                         │
+   │ - Spring Security       │
+   │ - JWT Authentication    │
+   │ - Authorization Filter  │
+   └───────────┬─────────────┘
+               │
+               ▼
+     ┌────────────────────┐
+     │   Service Layer    │
+     │                    │
+     │ - AuthService      │
+     │ - ProductService   │
+     │ - StockService     │
+     │ - SaleService      │
+     │ - ReportService    │
+     └─────────┬──────────┘
+               │
+               ▼
+   ┌──────────────────────────┐
+   │   Repository Layer       │
+   │                          │
+   │ - UsersRepository        │
+   │ - ProductsRepository     │
+   │ - StocksRepository       │
+   │ - SalesRepository        │
+   │ - SaleDetailsRepository  │
+   └───────────┬──────────────┘
+               │
+               ▼
+      ┌──────────────────┐
+      │  Database Layer  │
+      │                  │
+      │ - users          │
+      │ - products       │
+      │ - stocks         │
+      │ - sales          │
+      │ - sale_details   │
+      └──────────────────┘
+```
+
+### Architecture Summary
+
+| Step | Component        | Description                                                      |
+| ---- | ---------------- | ---------------------------------------------------------------- |
+| 1    | Client Layer     | User mengakses API melalui Swagger UI, Postman, atau REST Client |
+| 2    | Controller Layer | Menerima HTTP Request dan melakukan validasi request             |
+| 3    | Security Layer   | Memverifikasi JWT Token dan melakukan authorization              |
+| 4    | Service Layer    | Menjalankan business logic aplikasi                              |
+| 5    | Repository Layer | Mengakses database menggunakan Spring Data JPA                   |
+| 6    | Database Layer   | Menyimpan data master barang, stok, penjualan, dan laporan       |
+
+
+## Architecture Diagram
+
+See:
+
+- [docs/sequence-diagram.md](docs/sequence-diagram.md)
+
+
+## Folder Structure
+
+```text
+threepm-api-toko
+├── docs
+│   └── sequence-diagram.md
+├── logs
+│   ├── error.log
+│   └── trail.log
+├── src
+│   ├── main
+│   │   ├── java/com/threepm/api/toko
+│   │   │     ├── Config
+│   │   │     │   ├── OpenApiConfig.java
+│   │   │     │   └── SecurityConfig.java
+│   │   │     │
+│   │   │     ├── Controller
+│   │   │     │   ├── AuthController.java
+│   │   │     │   ├── ProductController.java
+│   │   │     │   ├── ReportController.java
+│   │   │     │   ├── SaleController.java
+│   │   │     │   └── StockController.java
+│   │   │     │
+│   │   │     ├── Model
+│   │   │     │   ├── Entity
+│   │   │     │   │   ├── Users.java
+│   │   │     │   │   ├── Products.java
+│   │   │     │   │   ├── Stocks.java
+│   │   │     │   │   ├── Sales.java
+│   │   │     │   │   └── SaleDetails.java
+│   │   │     │   │
+│   │   │     │   ├── Request
+│   │   │     │   │   ├── LoginRequest.java
+│   │   │     │   │   ├── ProductRequest.java
+│   │   │     │   │   ├── SaleRequest.java
+│   │   │     │   │   └── SaleDetailRequest.java
+│   │   │     │   │
+│   │   │     │   └── Response
+│   │   │     │       ├── BaseResponse.java
+│   │   │     │       ├── LoginResponse.java
+│   │   │     │       ├── ProductResponse.java
+│   │   │     │       ├── StockResponse.java
+│   │   │     │       ├── SaleResponse.java
+│   │   │     │       ├── SaleDetailResponse.java
+│   │   │     │       ├── TopSellingProductResponse.java
+│   │   │     │       ├── TopProfitProductResponse.java
+│   │   │     │       └── ProfitSaleResponse.java
+│   │   │     │
+│   │   │     ├── Repository
+│   │   │     │   ├── UsersRepository.java
+│   │   │     │   ├── ProductsRepository.java
+│   │   │     │   ├── StocksRepository.java
+│   │   │     │   ├── SalesRepository.java
+│   │   │     │   └── SaleDetailsRepository.java
+│   │   │     │
+│   │   │     ├── Service
+│   │   │     │   ├── AuthService.java
+│   │   │     │   ├── ProductService.java
+│   │   │     │   ├── StockService.java
+│   │   │     │   ├── SaleService.java
+│   │   │     │   ├── ReportService.java
+│   │   │     │   │
+│   │   │     │   └── impl
+│   │   │     │       ├── AuthServiceImpl.java
+│   │   │     │       ├── ProductServiceImpl.java
+│   │   │     │       ├── StockServiceImpl.java
+│   │   │     │       ├── SaleServiceImpl.java
+│   │   │     │       └── ReportServiceImpl.java
+│   │   │     │
+│   │   │     ├── Util
+│   │   │     │   └── JwtUtil.java
+│   │   │     │
+│   │   │     └── ApiTokoApplication.java
+│   │   │
+│   │   └── resources
+│   │       ├── application.yml
+│   │       ├── banner.txt
+│   │       └── db
+│   │           └── migration
+│   │               ├── V1__create_initial_schema.sql
+│   │               └── V2__insert_initial_data.sql
+│   │
+│   └── test/java/com/threepm/api/toko 
+│       └── ApiTokoApplicationTests.java
+│
+├── pom.xml
+├── run.sh
+├── README.md
+├── HELP.md
+├── Test for Backend.pdf
+├── mvnw
+├── mvnw.cmd
+└── .gitignore
+```
+
+## Architecture Diagram
+
+See:
+
+- [docs/sequence-diagram.md](docs/sequence-diagram.md)
+
+
+
+## Configuration
+
+Bagian ini menjelaskan konfigurasi utama yang digunakan oleh aplikasi **3pm-api-toko**.
+
+### Main Configuration (`application.yml`)
+
+File ini merupakan konfigurasi utama aplikasi yang digunakan saat menjalankan project secara lokal.
+
+```yaml
+spring:
+  application:
+    name: api-toko
+
+  banner:
+    location: classpath:banner.txt
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_toko
+    username: toko_user
+    password: toko_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.threepm.api.toko: DEBUG
+    org.springframework.security: INFO
+
+app:
+  name: 3PM Backend Test API Toko
+  version: 1.0.0
+
+  security:
+    jwt-secret: ${JWT_SECRET:3pm-backend-test-secret-key-minimum-32-characters}
+    jwt-expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    permit-all: ${APP_SECURITY_PERMIT_ALL:false}
+```
+
+### Environment Variables
+
+Berikut adalah environment variable yang dapat digunakan untuk melakukan override konfigurasi aplikasi.
+
+| Variable                | Default Value                                     | Description                                                    |
+| ----------------------- | ------------------------------------------------- | -------------------------------------------------------------- |
+| JWT_SECRET              | 3pm-backend-test-secret-key-minimum-32-characters | Secret key yang digunakan untuk signing JWT token              |
+| JWT_EXPIRATION_MS       | 86400000                                          | Masa berlaku JWT token dalam millisecond (24 jam)              |
+| APP_SECURITY_PERMIT_ALL | false                                             | Mengaktifkan atau menonaktifkan security pada seluruh endpoint |
 
 ## Application Startup
 
