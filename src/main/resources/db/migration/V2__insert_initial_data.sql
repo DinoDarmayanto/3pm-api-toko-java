@@ -2,7 +2,7 @@
 -- password: admin123
 INSERT INTO users (username, password, role)
 VALUES
-('admin', '$2a$10$7QJ8FZ6Xk4xYZkQhDwaWeOvlHcGlgpR.sMpt4Htr9Cjd1Sx7S1zqW', 'ADMIN');
+('admin', '$2a$10$Tgf2dpoh.amZ4uTWesUj2OGWQa2L8sDfyHJ8DupLri3DnvHhlUedO', 'ADMIN');
 
 -- Master barang
 INSERT INTO products (sku, product_name, purchase_price, selling_price, description)

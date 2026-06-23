@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,8 +28,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ProductResponse update(
             @PathVariable Long id,
-            @Valid @RequestBody ProductRequest request
-    ) {
+            @Valid @RequestBody ProductRequest request) {
         return productService.update(id, request);
     }
 
@@ -44,7 +43,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public Map<String, String> delete(@PathVariable Long id) {
         productService.delete(id);
+
+        return Map.of("message", "Product deleted successfully");
     }
 }

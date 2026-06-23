@@ -23,18 +23,37 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        log.info("[LOGIN] Attempt login username={}", request.getUsername());
+
+        log.info("[LOGIN] Attempt username={}", request.getUsername());
 
         Users user = usersRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
+                .orElseThrow(() -> {
+                    log.error("[LOGIN] User not found username={}", request.getUsername());
+                    return new BadCredentialsException("Invalid username or password");
+                });
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        log.info("[LOGIN] User found username={} role={}",
+                user.getUsername(),
+                user.getRole());
+
+        boolean match = passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword());
+
+        log.info("[LOGIN] Password match result={}", match);
+
+        if (!match) {
+            log.error("[LOGIN] Invalid password username={}", user.getUsername());
             throw new BadCredentialsException("Invalid username or password");
         }
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        log.info("[LOGIN] Generate JWT");
 
-        log.info("[LOGIN] Success username={}", user.getUsername());
+        String token = jwtUtil.generateToken(
+                user.getUsername(),
+                user.getRole());
+
+        log.info("[LOGIN] JWT Generated");
 
         return LoginResponse.builder()
                 .token(token)

@@ -1,6 +1,6 @@
 # 3pm-api-toko
 
-**Version:** `1.0.0`
+**Version:** `2.0.0`
 **Project Type:** Backend Developer Technical Test Submission
 **Java:** `OpenJDK 17`
 **Build Tool:** `Apache Maven`
@@ -877,6 +877,688 @@ Contoh response login:
 }
 ```
 
+## API Usage
+
+### Authentication
+
+### POST /api/auth/login
+
+Endpoint ini digunakan untuk melakukan login dan mendapatkan JWT Token yang digunakan untuk mengakses endpoint yang dilindungi.
+
+#### Request Format
+
+```json
+ {
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+#### Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc4MjE4NzIyOCwiZXhwIjoxNzgyMjczNjI4fQ.Zm8PAyVZEiQRKWNMJAoF0cfJxgogR__QuJMxzXFVphwgHQidiluVXAvB2XrOX-rZ",
+  "tokenType": "Bearer",
+  "username": "admin",
+  "role": "ADMIN"
+}
+```
+
+---
+
+## Master Barang
+
+### GET /api/products
+
+Endpoint ini digunakan untuk menampilkan seluruh data barang.
+
+#### Request Format
+
+Tidak memerlukan request body.
+
+#### Response
+
+```json
+[
+  {
+    "id": 1,
+    "sku": "BRG-001",
+    "productName": "Indomie Goreng",
+    "purchasePrice": 2500,
+    "sellingPrice": 3500,
+    "description": "Mie instan goreng",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 2,
+    "sku": "BRG-002",
+    "productName": "Aqua 600ml",
+    "purchasePrice": 3000,
+    "sellingPrice": 4500,
+    "description": "Air mineral botol 600ml",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 3,
+    "sku": "BRG-003",
+    "productName": "Teh Botol Sosro",
+    "purchasePrice": 3500,
+    "sellingPrice": 5000,
+    "description": "Minuman teh botol",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 4,
+    "sku": "BRG-004",
+    "productName": "Kopi Kapal Api",
+    "purchasePrice": 1200,
+    "sellingPrice": 2000,
+    "description": "Kopi sachet",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 5,
+    "sku": "BRG-005",
+    "productName": "Biskuit Roma",
+    "purchasePrice": 6000,
+    "sellingPrice": 8500,
+    "description": "Biskuit kemasan",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 6,
+    "sku": "BRG-006",
+    "productName": "Susu Ultra 250ml",
+    "purchasePrice": 5000,
+    "sellingPrice": 7500,
+    "description": "Susu UHT kemasan kecil",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 7,
+    "sku": "BRG-007",
+    "productName": "Chitato 68g",
+    "purchasePrice": 8000,
+    "sellingPrice": 12000,
+    "description": "Snack kentang kemasan",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 8,
+    "sku": "BRG-008",
+    "productName": "Roti Tawar",
+    "purchasePrice": 11000,
+    "sellingPrice": 15000,
+    "description": "Roti tawar kemasan",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 9,
+    "sku": "BRG-009",
+    "productName": "Sabun Lifebuoy",
+    "purchasePrice": 3500,
+    "sellingPrice": 6000,
+    "description": "Sabun mandi batang",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  },
+  {
+    "id": 10,
+    "sku": "BRG-010",
+    "productName": "Shampoo Sunsilk",
+    "purchasePrice": 9000,
+    "sellingPrice": 13500,
+    "description": "Shampoo botol kecil",
+    "createdAt": "2026-06-23T11:22:22.516665",
+    "updatedAt": "2026-06-23T11:22:22.516665"
+  }
+]
+```
+
+### GET /api/products/{id}
+
+Endpoint ini digunakan untuk menampilkan detail barang berdasarkan ID.
+
+#### Request Format
+
+```text
+GET /api/products/1
+```
+
+#### Response
+
+```json
+{
+  "id": 1,
+  "sku": "BRG-001",
+  "productName": "Indomie Goreng",
+  "purchasePrice": 2500,
+  "sellingPrice": 3500,
+  "description": "Mie instan goreng",
+  "createdAt": "2026-06-23T11:22:22.516665",
+  "updatedAt": "2026-06-23T11:22:22.516665"
+}
+```
+
+### POST /api/products
+
+Endpoint ini digunakan untuk menambahkan barang baru.
+
+#### Request Format
+
+```json
+{
+  "sku": "BRG-011",
+  "productName": "Pocari Sweat",
+  "purchasePrice": 5000,
+  "sellingPrice": 7000,
+  "description": "Minuman isotonik"
+}
+```
+
+#### Response
+
+```json
+{
+  "id": 11,
+  "sku": "BRG-011",
+  "productName": "Pocari Sweat",
+  "purchasePrice": 5000,
+  "sellingPrice": 7000,
+  "description": "Minuman isotonik",
+  "createdAt": "2026-06-23T11:34:00.837158",
+  "updatedAt": "2026-06-23T11:34:00.83719"
+}
+```
+
+### PUT /api/products/{id}
+
+Endpoint ini digunakan untuk memperbarui data barang.
+
+#### Request Format
+
+```json
+{
+  "sku": "BRG-011",
+  "productName": "Pocari Sweat 500ml",
+  "purchasePrice": 5500,
+  "sellingPrice": 7500,
+  "description": "Updated Product"
+}
+```
+
+#### Response
+
+```json
+{
+  "id": 11,
+  "sku": "BRG-011",
+  "productName": "Pocari Sweat 500ml",
+  "purchasePrice": 5500,
+  "sellingPrice": 7500,
+  "description": "Updated Product",
+  "createdAt": "2026-06-23T11:34:00.837158",
+  "updatedAt": "2026-06-23T11:34:00.83719"
+}
+```
+
+### DELETE /api/products/{id}
+
+Endpoint ini digunakan untuk menghapus data barang.
+
+#### Request Format
+
+```text
+DELETE /api/products/11
+```
+
+#### Response
+
+```json
+{
+  "message": "Product deleted successfully"
+}
+```
+
+---
+
+## Stocks
+
+### GET /api/stocks
+
+Endpoint ini digunakan untuk menampilkan seluruh data stok barang.
+
+#### Request Format
+
+Tidak memerlukan request body.
+
+#### Response
+
+```json
+[
+  {
+    "productId": 2,
+    "sku": "BRG-002",
+    "productName": "Aqua 600ml",
+    "quantity": 100
+  },
+  {
+    "productId": 3,
+    "sku": "BRG-003",
+    "productName": "Teh Botol Sosro",
+    "quantity": 100
+  },
+  {
+    "productId": 4,
+    "sku": "BRG-004",
+    "productName": "Kopi Kapal Api",
+    "quantity": 100
+  },
+  {
+    "productId": 5,
+    "sku": "BRG-005",
+    "productName": "Biskuit Roma",
+    "quantity": 100
+  },
+  {
+    "productId": 6,
+    "sku": "BRG-006",
+    "productName": "Susu Ultra 250ml",
+    "quantity": 100
+  },
+  {
+    "productId": 7,
+    "sku": "BRG-007",
+    "productName": "Chitato 68g",
+    "quantity": 100
+  },
+  {
+    "productId": 8,
+    "sku": "BRG-008",
+    "productName": "Roti Tawar",
+    "quantity": 100
+  },
+  {
+    "productId": 9,
+    "sku": "BRG-009",
+    "productName": "Sabun Lifebuoy",
+    "quantity": 100
+  },
+  {
+    "productId": 10,
+    "sku": "BRG-010",
+    "productName": "Shampoo Sunsilk",
+    "quantity": 100
+  }
+]
+```
+
+### GET /api/stocks/{productId}
+
+Endpoint ini digunakan untuk menampilkan stok berdasarkan product ID.
+
+#### Request Format
+
+```text
+GET /api/stocks/2
+```
+
+#### Response
+
+```json
+{
+  "productId": 2,
+  "sku": "BRG-002",
+  "productName": "Aqua 600ml",
+  "quantity": 100
+}
+```
+
+---
+
+## Sales
+
+### POST /api/sales
+
+Endpoint ini digunakan untuk membuat transaksi penjualan dan mengurangi stok secara otomatis.
+
+#### Request Format
+
+```json
+{
+  "items": [
+    {
+      "productId": 3,
+      "quantity": 2
+    },
+    {
+      "productId": 4,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+#### Response
+
+```json
+{
+  "id": 3,
+  "transactionNo": "AA202606230001",
+  "saleDate": "2026-06-23T12:04:12.504663461",
+  "totalAmount": 12000,
+  "details": [
+    {
+      "productId": 3,
+      "sku": "BRG-003",
+      "productName": "Teh Botol Sosro",
+      "quantity": 2,
+      "purchasePrice": 3500,
+      "sellingPrice": 5000,
+      "subtotal": 10000,
+      "profit": 3000
+    },
+    {
+      "productId": 4,
+      "sku": "BRG-004",
+      "productName": "Kopi Kapal Api",
+      "quantity": 1,
+      "purchasePrice": 1200,
+      "sellingPrice": 2000,
+      "subtotal": 2000,
+      "profit": 800
+    }
+  ]
+}
+```
+
+### GET /api/sales
+
+Endpoint ini digunakan untuk menampilkan seluruh transaksi penjualan.
+
+#### Request Format
+
+Tidak memerlukan request body.
+
+#### Response
+
+```json
+[
+  {
+    "id": 3,
+    "transactionNo": "AA202606230001",
+    "saleDate": "2026-06-23T12:04:12.504663",
+    "totalAmount": 12000,
+    "details": [
+      {
+        "productId": 3,
+        "sku": "BRG-003",
+        "productName": "Teh Botol Sosro",
+        "quantity": 2,
+        "purchasePrice": 3500,
+        "sellingPrice": 5000,
+        "subtotal": 10000,
+        "profit": 3000
+      },
+      {
+        "productId": 4,
+        "sku": "BRG-004",
+        "productName": "Kopi Kapal Api",
+        "quantity": 1,
+        "purchasePrice": 1200,
+        "sellingPrice": 2000,
+        "subtotal": 2000,
+        "profit": 800
+      }
+    ]
+  }
+]
+```
+
+### GET /api/sales/{id}
+
+Endpoint ini digunakan untuk menampilkan detail transaksi penjualan berdasarkan ID.
+
+#### Request Format
+
+```text
+GET /api/sales/3
+```
+
+#### Response
+
+```json
+{
+  "id": 3,
+  "transactionNo": "AA202606230001",
+  "saleDate": "2026-06-23T12:04:12.504663",
+  "totalAmount": 12000,
+  "details": [
+    {
+      "productId": 3,
+      "sku": "BRG-003",
+      "productName": "Teh Botol Sosro",
+      "quantity": 2,
+      "purchasePrice": 3500,
+      "sellingPrice": 5000,
+      "subtotal": 10000,
+      "profit": 3000
+    },
+    {
+      "productId": 4,
+      "sku": "BRG-004",
+      "productName": "Kopi Kapal Api",
+      "quantity": 1,
+      "purchasePrice": 1200,
+      "sellingPrice": 2000,
+      "subtotal": 2000,
+      "profit": 800
+    }
+  ]
+}
+```
+
+---
+
+## Reports
+
+### GET /api/reports/top-selling-products
+
+Endpoint ini digunakan untuk menampilkan 5 barang terlaris berdasarkan total quantity yang terjual.
+
+#### Response
+
+```json
+[
+  {
+    "productId": 9,
+    "sku": "BRG-009",
+    "productName": "Sabun Lifebuoy",
+    "totalQty": 10
+  },
+  {
+    "productId": 5,
+    "sku": "BRG-005",
+    "productName": "Biskuit Roma",
+    "totalQty": 7
+  },
+  {
+    "productId": 6,
+    "sku": "BRG-006",
+    "productName": "Susu Ultra 250ml",
+    "totalQty": 5
+  },
+  {
+    "productId": 8,
+    "sku": "BRG-008",
+    "productName": "Roti Tawar",
+    "totalQty": 4
+  },
+  {
+    "productId": 7,
+    "sku": "BRG-007",
+    "productName": "Chitato 68g",
+    "totalQty": 3
+  }
+]
+```
+
+### GET /api/reports/top-profitable-products
+
+Endpoint ini digunakan untuk menampilkan 5 barang dengan keuntungan tertinggi.
+
+#### Response
+
+```json
+[
+  {
+    "productId": 9,
+    "sku": "BRG-009",
+    "productName": "Sabun Lifebuoy",
+    "qty": 10,
+    "total": 60000,
+    "modal": 35000,
+    "keuntungan": 25000
+  },
+  {
+    "productId": 5,
+    "sku": "BRG-005",
+    "productName": "Biskuit Roma",
+    "qty": 7,
+    "total": 59500,
+    "modal": 42000,
+    "keuntungan": 17500
+  },
+  {
+    "productId": 8,
+    "sku": "BRG-008",
+    "productName": "Roti Tawar",
+    "qty": 4,
+    "total": 60000,
+    "modal": 44000,
+    "keuntungan": 16000
+  },
+  {
+    "productId": 6,
+    "sku": "BRG-006",
+    "productName": "Susu Ultra 250ml",
+    "qty": 5,
+    "total": 37500,
+    "modal": 25000,
+    "keuntungan": 12500
+  },
+  {
+    "productId": 7,
+    "sku": "BRG-007",
+    "productName": "Chitato 68g",
+    "qty": 3,
+    "total": 36000,
+    "modal": 24000,
+    "keuntungan": 12000
+  }
+]
+```
+
+### GET /api/reports/sales-containing-top-profitable-products
+
+Endpoint ini digunakan untuk menampilkan transaksi yang mengandung 5 barang paling menguntungkan.
+
+#### Response
+
+```json
+[
+  {
+    "idPenjualan": 6,
+    "transactionNo": "AA202606230004",
+    "tanggal": "2026-06-23T12:08:41.681316",
+    "detailBarang": [
+      {
+        "productId": 9,
+        "sku": "BRG-009",
+        "productName": "Sabun Lifebuoy",
+        "quantity": 10,
+        "purchasePrice": 3500,
+        "sellingPrice": 6000,
+        "subtotal": 60000,
+        "profit": 25000
+      },
+      {
+        "productId": 10,
+        "sku": "BRG-010",
+        "productName": "Shampoo Sunsilk",
+        "quantity": 2,
+        "purchasePrice": 9000,
+        "sellingPrice": 13500,
+        "subtotal": 27000,
+        "profit": 9000
+      }
+    ]
+  },
+  {
+    "idPenjualan": 5,
+    "transactionNo": "AA202606230003",
+    "tanggal": "2026-06-23T12:08:17.278357",
+    "detailBarang": [
+      {
+        "productId": 7,
+        "sku": "BRG-007",
+        "productName": "Chitato 68g",
+        "quantity": 3,
+        "purchasePrice": 8000,
+        "sellingPrice": 12000,
+        "subtotal": 36000,
+        "profit": 12000
+      },
+      {
+        "productId": 8,
+        "sku": "BRG-008",
+        "productName": "Roti Tawar",
+        "quantity": 4,
+        "purchasePrice": 11000,
+        "sellingPrice": 15000,
+        "subtotal": 60000,
+        "profit": 16000
+      }
+    ]
+  },
+  {
+    "idPenjualan": 4,
+    "transactionNo": "AA202606230002",
+    "tanggal": "2026-06-23T12:08:00.500986",
+    "detailBarang": [
+      {
+        "productId": 5,
+        "sku": "BRG-005",
+        "productName": "Biskuit Roma",
+        "quantity": 7,
+        "purchasePrice": 6000,
+        "sellingPrice": 8500,
+        "subtotal": 59500,
+        "profit": 17500
+      },
+      {
+        "productId": 6,
+        "sku": "BRG-006",
+        "productName": "Susu Ultra 250ml",
+        "quantity": 5,
+        "purchasePrice": 5000,
+        "sellingPrice": 7500,
+        "subtotal": 37500,
+        "profit": 12500
+      }
+    ]
+  }
+]
+```
 
 ## Prerequisites
 
@@ -906,25 +1588,45 @@ TPS 240 (peak load)
 
 ## Changelog
 
+### v2.0.0
+- Added JWT Authentication Filter
+- Fixed protected endpoint authorization using Bearer Token
+- Fixed login authentication flow
+- Added detailed service logging for easier tracking
+- Added product service tracking logs
+- Added stock service tracking logs
+- Added sales transaction tracking logs
+- Added not found response handling
+- Added custom `ResourceNotFoundException`
+- Added global exception handler
+- Improved product not found response
+- Improved stock not found response
+- Fixed DELETE product response message
+- Fixed Flyway migration issue during local development
+- Improved API response documentation
+- Improved README documentation
+- Updated API usage examples
+- Updated architecture and sequence diagram documentation
+
 ### v1.0.0
 
 Initial release for Backend Developer Technical Test.
 
 Features included:
 
-* JWT Authentication
-* Login API
-* CRUD Master Barang
-* Stock Management
-* Sales Transaction Management
-* Automatic Transaction Number Generation
-* Top 5 Best Selling Products Report
-* Top 5 Most Profitable Products Report
-* Sales Report Containing Top 5 Most Profitable Products
-* PostgreSQL Integration
-* Flyway Database Migration
-* Swagger/OpenAPI Documentation
-* Spring Security Integration
+- JWT Authentication
+- Login API
+- CRUD Master Barang
+- Stock Management
+- Sales Transaction Management
+- Automatic Transaction Number Generation
+- Top 5 Best Selling Products Report
+- Top 5 Most Profitable Products Report
+- Sales Report Containing Top 5 Most Profitable Products
+- PostgreSQL Integration
+- Flyway Database Migration
+- Swagger/OpenAPI Documentation
+- Spring Security Integration
 
 ---
 
