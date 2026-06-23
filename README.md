@@ -52,68 +52,66 @@ AA202606230001
 ## Architecture
 
 ```text
-┌─────────────────────────────┐
-│         Client Layer        │
-│                             │
-│ - Swagger UI                │
-│ - Postman                   │
-│ - REST Client               │
-└──────────────┬──────────────┘
+     ┌────────────────────┐
+     │  Client Layer      │
+     │                    │
+     │ - Swagger UI       │
+     │ - Postman          │
+     │ - REST Client      │
+     └─────────┬──────────┘
                │ HTTP Request
                ▼
-┌─────────────────────────────┐
-│      Controller Layer       │
-│                             │
-│ - AuthController            │
-│ - ProductController         │
-│ - StockController           │
-│ - SaleController            │
-│ - ReportController          │
-└──────────────┬──────────────┘
+   ┌─────────────────────────┐
+   │    Controller Layer     │
+   │                         │
+   │ - AuthController        │
+   │ - ProductController     │
+   │ - StockController       │
+   │ - SaleController        │
+   │ - ReportController      │
+   └───────────┬─────────────┘
                │
                ▼
-┌─────────────────────────────┐
-│       Security Layer        │
-│                             │
-│ - Spring Security           │
-│ - JWT Authentication        │
-│ - Authorization Filter      │
-└──────────────┬──────────────┘
+   ┌─────────────────────────┐
+   │    Security Layer       │
+   │                         │
+   │ - Spring Security       │
+   │ - JWT Authentication    │
+   │ - Authorization Filter  │
+   └───────────┬─────────────┘
                │
                ▼
-┌─────────────────────────────┐
-│        Service Layer        │
-│                             │
-│ - AuthService               │
-│ - ProductService            │
-│ - StockService              │
-│ - SaleService               │
-│ - ReportService             │
-└──────────────┬──────────────┘
+     ┌────────────────────┐
+     │   Service Layer    │
+     │                    │
+     │ - AuthService      │
+     │ - ProductService   │
+     │ - StockService     │
+     │ - SaleService      │
+     │ - ReportService    │
+     └─────────┬──────────┘
                │
                ▼
-┌─────────────────────────────┐
-│      Repository Layer       │
-│                             │
-│ - UsersRepository           │
-│ - ProductsRepository        │
-│ - StocksRepository          │
-│ - SalesRepository           │
-│ - SaleDetailsRepository     │
-└──────────────┬──────────────┘
+   ┌──────────────────────────┐
+   │   Repository Layer       │
+   │                          │
+   │ - UsersRepository        │
+   │ - ProductsRepository     │
+   │ - StocksRepository       │
+   │ - SalesRepository        │
+   │ - SaleDetailsRepository  │
+   └───────────┬──────────────┘
                │
                ▼
-┌─────────────────────────────┐
-│       Database Layer        │
-│                             │
-│ PostgreSQL                 │
-│                             │
-│ - users                    │
-│ - products                 │
-│ - stocks                   │
-│ - sales                    │
-│ - sale_details             │
-└─────────────────────────────┘
+      ┌──────────────────┐
+      │  Database Layer  │
+      │                  │
+      │ - users          │
+      │ - products       │
+      │ - stocks         │
+      │ - sales          │
+      │ - sale_details   │
+      └──────────────────┘
 ```
 
 ### Architecture Summary
